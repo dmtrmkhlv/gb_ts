@@ -1,4 +1,4 @@
-import { renderSearchFormBlock, search } from './search-form.js'
+import { CallBack, renderSearchFormBlock, search } from './search-form.js'
 import { renderSearchStubBlock } from './search-results.js'
 import { renderUserBlock, User } from './user.js'
 import { renderToast } from './lib.js'
@@ -17,7 +17,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
   renderUserBlock(username, avatarUrl, favoritesAmount)
   renderSearchFormBlock({'startDate':'', 'endDate':''})
-  search("search")
+  search("search", CallBack)
   renderSearchStubBlock()
   renderToast({
     text: 'Это пример уведомления. Используйте его при необходимости',

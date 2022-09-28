@@ -6,11 +6,28 @@ export interface SearchFormData {
   endDate:string
 }
 
-// Написать функцию-обработчик формы search, которая собирает заполненные пользователем данные в формате описанной структуры и передаёт их в функцию поиска.
-export function search (formName: string) {  
+/*
+2. Написать функцию-обработчик формы search, которая собирает заполненные пользователем данные в формате описанной структуры и передаёт их в функцию поиска.
+3. * Добавить в функцию search вторым аргументом функцию-обратного вызова, которая
+принимает либо ошибку либо массив результатов интерфейса Place. Данный интерфейс пока
+оставить пустым. Функция поиска делает задержку в несколько секунд, после чего с
+вероятностью 50 на 50 выдаёт либо ошибку либо пустой массив.
+*/
+
+interface Place{}
+
+export function CallBack(value: string | Place){
+  if(Math.random() >= 0.5){
+    throw Error("value");;
+  }
+  return []
+};
+
+export function search (formName: string, cb:Function = function() {}) {  
   const form = document.getElementById(formName);
   const data = {'startDate':form['check-in-date'].value, 'endDate':form['check-out-date'].value};
   findData(data);
+  setTimeout(cb, 3000);
   form.addEventListener('change',()=>{
     const data = {'startDate':form['check-in-date'].value, 'endDate':form['check-out-date'].value};
     findData(data);
