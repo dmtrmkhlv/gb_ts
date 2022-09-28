@@ -1,21 +1,43 @@
 import { renderBlock } from './lib.js'
 
-export function renderSearchFormBlock (startDate:string, endDate:string) {
+// Создать интерфейс SearchFormData, в котором описать структуру для полей поисковой формы. 
+export interface SearchFormData {
+  startDate:string, 
+  endDate:string
+}
+
+// Написать функцию-обработчик формы search, которая собирает заполненные пользователем данные в формате описанной структуры и передаёт их в функцию поиска.
+export function search (formName: string) {  
+  const form = document.getElementById(formName);
+  const data = {'startDate':form['check-in-date'].value, 'endDate':form['check-out-date'].value};
+  findData(data);
+  form.addEventListener('change',()=>{
+    const data = {'startDate':form['check-in-date'].value, 'endDate':form['check-out-date'].value};
+    findData(data);
+  })
+}
+
+// Функция поиска принимает как аргумент переменную интерфейса SearchFormData, выводит полученный аргумент в консоль и ничего не возвращает
+export function findData (data: SearchFormData):void {
+  console.log(data);
+}
+
+export function renderSearchFormBlock (data: SearchFormData) {
   let currentDate = new Date();
   let minDate = `${currentDate.getFullYear()}-${('0'+(currentDate.getMonth()+1)).slice(-2)}-${currentDate.getDate()}`;
   let maxDateFull = new Date(currentDate.getFullYear(), currentDate.getMonth() + 2, 0);  
   let maxDate = `${maxDateFull.getFullYear()}-${('0'+(maxDateFull.getMonth()+1)).slice(-2)}-${maxDateFull.getDate()}`;
-  if(!startDate){
-    startDate = `${new Date(currentDate).getFullYear()}-${('0'+(currentDate.getMonth()+1)).slice(-2)}-${('0'+(new Date(currentDate).getDate()+1)).slice(-2)}`;
+  if(!data.startDate){
+    data.startDate = `${new Date(currentDate).getFullYear()}-${('0'+(currentDate.getMonth()+1)).slice(-2)}-${('0'+(new Date(currentDate).getDate()+1)).slice(-2)}`;
   }
-  if(!endDate){
-    endDate = `${new Date(currentDate).getFullYear()}-${('0'+(currentDate.getMonth()+1)).slice(-2)}-${('0'+(new Date(startDate).getDate()+2)).slice(-2)}`;
+  if(!data.endDate){
+    data.endDate = `${new Date(currentDate).getFullYear()}-${('0'+(currentDate.getMonth()+1)).slice(-2)}-${('0'+(new Date(currentDate).getDate()+2)).slice(-2)}`;
   }
   
   renderBlock(
     'search-form-block',
     `
-    <form>
+    <form id="search">
       <fieldset class="search-filedset">
         <div class="row">
           <div>
@@ -31,11 +53,11 @@ export function renderSearchFormBlock (startDate:string, endDate:string) {
         <div class="row">
           <div>
             <label for="check-in-date">Дата заезда</label>
-            <input id="check-in-date" type="date" value="${startDate}" min="${minDate}" max="${maxDate}" name="checkin" />
+            <input id="check-in-date" type="date" value="${data.startDate}" min="${minDate}" max="${maxDate}" name="checkin" />
           </div>
           <div>
             <label for="check-out-date">Дата выезда</label>
-            <input id="check-out-date" type="date" value="${endDate}" min="${startDate}" max="${maxDate}" name="checkout" />
+            <input id="check-out-date" type="date" value="${data.endDate}" min="${data.startDate}" max="${maxDate}" name="checkout" />
           </div>
           <div>
             <label for="max-price">Макс. цена суток</label>

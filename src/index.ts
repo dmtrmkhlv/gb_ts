@@ -1,4 +1,4 @@
-import { renderSearchFormBlock } from './search-form.js'
+import { renderSearchFormBlock, search } from './search-form.js'
 import { renderSearchStubBlock } from './search-results.js'
 import { renderUserBlock, User } from './user.js'
 import { renderToast } from './lib.js'
@@ -16,8 +16,8 @@ window.addEventListener('DOMContentLoaded', () => {
   const favoritesAmount = getFavoritesAmount("favoritesAmount");  
 
   renderUserBlock(username, avatarUrl, favoritesAmount)
-  // renderSearchFormBlock('2022-09-25', '2022-09-30')
-  renderSearchFormBlock('', '')
+  renderSearchFormBlock({'startDate':'', 'endDate':''})
+  search("search")
   renderSearchStubBlock()
   renderToast({
     text: 'Это пример уведомления. Используйте его при необходимости',
