@@ -33,7 +33,7 @@ export function renderSearchResultsBlock(results: []) {
       <li class="result">
       <div class="result-container">
         <div class="result-img-container">
-          <div class="favorites"></div>
+          <div data-id=${place.id} data-name=${JSON.stringify(place.name)} data-image=${place.image} class="favorites js-favorite"></div>
           <img class="result-img" src="${place.image}" alt="">
         </div>	
         <div class="result-info">
@@ -69,7 +69,7 @@ export function renderSearchResultsBlock(results: []) {
             </select>
         </div>
     </div>
-    <ul class="results-list">
+    <ul class="results-list js-results-list">
     ${placeItems.join('')}
     </ul>
     `

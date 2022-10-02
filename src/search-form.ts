@@ -1,6 +1,7 @@
 import { searchPlace } from './get-api.js';
 import { renderBlock } from './lib.js'
 import { renderSearchResultsBlock } from './search-results.js';
+import { toggleFavoriteItem } from './user.js';
 
 // Создать интерфейс SearchFormData, в котором описать структуру для полей поисковой формы. 
 export interface SearchFormData {
@@ -51,7 +52,10 @@ export function findData (data: SearchFormData):void {
   searchPlace(new Date(data['startDate']), new Date(data['endDate']), data['maxPrice'])
   .then((results) => {
     renderSearchResultsBlock(results);
-    console.log('places length', results)
+    // console.log('places length', results)
+  })
+  .then(()=>{
+    toggleFavoriteItem();
   })
 }
 

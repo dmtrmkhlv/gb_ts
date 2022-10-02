@@ -9,6 +9,7 @@ window.addEventListener('DOMContentLoaded', () => {
   // Set localStorage for test
   localStorage.user = JSON.stringify({"username": 'Wade Warren', "avatarUrl": '/img/avatar.png'});
   localStorage.favoritesAmount = 3;
+  localStorage.favoriteItems = JSON.stringify([]);
   
   // const user = new User('Wade Warren', '/img/avatar.png', 0);
   const user = getUserData("user");
