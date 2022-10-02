@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "build": "rd -r public\\scripts 2>null & tsc",
     "develop": "rd -r public\\scripts 2>null & tsc -p tsconfig-dev.json",
@@ -24,6 +25,7 @@
   },
   "homepage": "https://github.com/dmtrmkhlv/gb_ts#readme",
   "devDependencies": {
+    "@types/node": "^18.7.23",
     "@typescript-eslint/eslint-plugin": "^5.38.0",
     "@typescript-eslint/parser": "^5.38.0",
     "eslint": "^8.23.1",

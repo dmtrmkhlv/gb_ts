@@ -3,6 +3,7 @@ import { renderSearchStubBlock } from './search-results.js'
 import { renderUserBlock, User } from './user.js'
 import { renderToast } from './lib.js'
 import { getUserData, getFavoritesAmount} from './get-user-info.js'
+import {searchPlace} from './get-api.js'
 
 window.addEventListener('DOMContentLoaded', () => {
   // Set localStorage for test
@@ -16,7 +17,7 @@ window.addEventListener('DOMContentLoaded', () => {
   const favoritesAmount = getFavoritesAmount("favoritesAmount");  
 
   renderUserBlock(username, avatarUrl, favoritesAmount)
-  renderSearchFormBlock({'startDate':'', 'endDate':''})
+  renderSearchFormBlock({'startDate':'', 'endDate':'', 'maxPrice': 0})
   search("search", CallBack)
   renderSearchStubBlock()
   renderToast({

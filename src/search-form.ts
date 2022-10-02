@@ -1,9 +1,12 @@
+import { searchPlace } from './get-api.js';
 import { renderBlock } from './lib.js'
+import { renderSearchResultsBlock } from './search-results.js';
 
 // Создать интерфейс SearchFormData, в котором описать структуру для полей поисковой формы. 
 export interface SearchFormData {
   startDate:string, 
-  endDate:string
+  endDate:string,
+  maxPrice?: number
 }
 
 /*
@@ -14,7 +17,15 @@ export interface SearchFormData {
 вероятностью 50 на 50 выдаёт либо ошибку либо пустой массив.
 */
 
-interface Place{}
+export interface Place{
+  id: number;
+  image: string;
+  name: string;
+  description: string;
+  remoteness: number;
+  bookedDates: number[];
+  price: number;
+}
 
 export function CallBack(value: string | Place){
   if(Math.random() >= 0.5){
@@ -28,15 +39,20 @@ export function search (formName: string, cb:Function = function() {}) {
   const data = {'startDate':form['check-in-date'].value, 'endDate':form['check-out-date'].value};
   findData(data);
   setTimeout(cb, 3000);
-  form.addEventListener('change',()=>{
-    const data = {'startDate':form['check-in-date'].value, 'endDate':form['check-out-date'].value};
+  form.addEventListener('submit',(e)=>{
+    e.preventDefault();
+    let data = {'startDate':form['check-in-date'].value, 'endDate':form['check-out-date'].value, 'maxPrice':form['max-price'].value};
     findData(data);
   })
 }
 
 // Функция поиска принимает как аргумент переменную интерфейса SearchFormData, выводит полученный аргумент в консоль и ничего не возвращает
 export function findData (data: SearchFormData):void {
-  console.log(data);
+  searchPlace(new Date(data['startDate']), new Date(data['endDate']), data['maxPrice'])
+  .then((results) => {
+    renderSearchResultsBlock(results);
+    console.log('places length', results)
+  })
 }
 
 export function renderSearchFormBlock (data: SearchFormData) {
@@ -78,7 +94,7 @@ export function renderSearchFormBlock (data: SearchFormData) {
           </div>
           <div>
             <label for="max-price">Макс. цена суток</label>
-            <input id="max-price" type="text" value="" name="price" class="max-price" />
+            <input id="max-price" type="number" value="" name="price" class="max-price" />
           </div>
           <div>
             <div><button>Найти</button></div>
