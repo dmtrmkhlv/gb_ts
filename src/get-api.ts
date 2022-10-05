@@ -1,3 +1,12 @@
+/**
+ * commands:
+ *  cd typescript-homy-api
+ *  npm run start
+ * 
+ * cd typescript-flatrent-sdk 
+ * npm run start
+ */
+
 export function dateToUnixStamp(date: Date) {
   return date.getTime() / 1000
 }

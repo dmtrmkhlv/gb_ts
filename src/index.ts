@@ -3,8 +3,8 @@ import { renderSearchStubBlock } from './search-results.js'
 import { renderUserBlock, User } from './user.js'
 import { renderToast } from './lib.js'
 import { getUserData, getFavoritesAmount} from './get-user-info.js'
-import {searchPlace} from './get-api.js'
 
+if (typeof window !== 'undefined') 
 window.addEventListener('DOMContentLoaded', () => {
   // Set localStorage for test
   localStorage.user = JSON.stringify({"username": 'Wade Warren', "avatarUrl": '/img/avatar.png'});

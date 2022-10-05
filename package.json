@@ -2,12 +2,14 @@
   "name": "gb_ts",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
   "type": "module",
+  "main": "./public/scripts/index.js",
+  "types": "./public/scripts/types/index.d.ts",
   "scripts": {
     "build": "rd -r public\\scripts 2>null & tsc",
     "develop": "rd -r public\\scripts 2>null & tsc -p tsconfig-dev.json",
     "start": "http-server -c-1 -p 3000",
+    "start:cli": "node public/scripts",
     "lint": "eslint src --ext .js --ext .ts",
     "lint-fix": "eslint src --ext .js --ext .ts --fix"
   },

@@ -3,11 +3,17 @@ import { renderBlock } from './lib.js'
 import { renderSearchResultsBlock } from './search-results.js';
 import { toggleFavoriteItem } from './user.js';
 
+import {FlatRentSdk} from './geekbrains-flat-rent-sdk.js'
+
+const sdk = new FlatRentSdk()
+
 // Создать интерфейс SearchFormData, в котором описать структуру для полей поисковой формы. 
 export interface SearchFormData {
   startDate:string, 
   endDate:string,
-  maxPrice?: number
+  maxPrice?: number,
+  flatRent?: boolean,
+  homy?: boolean
 }
 
 /*
@@ -19,13 +25,19 @@ export interface SearchFormData {
 */
 
 export interface Place{
-  id: number;
+  id: number | string;
   image: string;
   name: string;
   description: string;
   remoteness: number;
   bookedDates: number[];
   price: number;
+
+  coordinates?:number[]
+  details?:string;
+  photos?:string[];
+  title?:string;
+  totalPrice?:number;
 }
 
 export function CallBack(value: string | Place){
@@ -37,24 +49,57 @@ export function CallBack(value: string | Place){
 
 export function search (formName: string, cb:Function = function() {}) {  
   const form = document.getElementById(formName);
-  const data = {'startDate':form['check-in-date'].value, 'endDate':form['check-out-date'].value};
+  const data = {'startDate':form['check-in-date'].value, 'endDate':form['check-out-date'].value, 'flatRent': form['flat-rent'].checked, 'homy':form['homy'].checked};
   findData(data);
   setTimeout(cb, 3000);
   form.addEventListener('submit',(e)=>{
     e.preventDefault();
-    let data = {'startDate':form['check-in-date'].value, 'endDate':form['check-out-date'].value, 'maxPrice':form['max-price'].value};
+    let data = {'startDate':form['check-in-date'].value, 'endDate':form['check-out-date'].value, 'maxPrice':form['max-price'].value || null, 'flatRent': form['flat-rent'].checked, 'homy':form['homy'].checked};    
     findData(data);
   })
 }
 
 // Функция поиска принимает как аргумент переменную интерфейса SearchFormData, выводит полученный аргумент в консоль и ничего не возвращает
 export function findData (data: SearchFormData):void {
-  searchPlace(new Date(data['startDate']), new Date(data['endDate']), data['maxPrice'])
-  .then((results) => {
-    renderSearchResultsBlock(results);
-    // console.log('places length', results)
-  })
-  .then(()=>{
+
+  new Promise(function(resolve, reject) {
+    
+    if(data['flatRent']){
+      resolve( new Promise((resolve, reject) => { // (*)
+        sdk.search({
+          city: 'Санкт-Петербург',
+          checkInDate: new Date(data['startDate']),
+          checkOutDate: new Date(data['endDate']),
+          priceLimit: data['maxPrice']
+        })
+        .then((flatResult:object|null) => {
+          resolve(flatResult);
+        })
+      }))
+    }
+    resolve({})
+
+  }).then((flatResult: {})=>{
+
+    if(data['homy']){
+      return new Promise((resolve, reject) => {
+        searchPlace(new Date(data['startDate']), new Date(data['endDate']), data['maxPrice'])
+        .then((homyResults:object|null) => {
+          if(Object.keys(flatResult).length != 0){
+            resolve({flatResult, homyResults});
+          }
+          resolve({homyResults});
+        })
+      });
+    }
+    if(Object.keys(flatResult).length != 0){
+      return {flatResult}
+    }
+    return {}
+    
+
+  }).then((allResult: {})=>{    
+    renderSearchResultsBlock(allResult);
     toggleFavoriteItem();
   })
 }
@@ -82,10 +127,10 @@ export function renderSearchFormBlock (data: SearchFormData) {
             <input id="city" type="text" disabled value="Санкт-Петербург" />
             <input type="hidden" disabled value="59.9386,30.3141" />
           </div>
-          <!--<div class="providers">
-            <label><input type="checkbox" name="provider" value="homy" checked /> Homy</label>
-            <label><input type="checkbox" name="provider" value="flat-rent" checked /> FlatRent</label>
-          </div>--!>
+          <div class="providers">
+            <label><input type="checkbox" name="provider" value="homy" id="homy" checked /> Homy</label>
+            <label><input type="checkbox" name="provider" value="flat-rent" id="flat-rent" checked /> FlatRent</label>
+          </div>
         </div>
         <div class="row">
           <div>

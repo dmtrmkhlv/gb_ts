@@ -25,36 +25,45 @@ export function renderEmptyOrErrorSearchBlock(reasonMessage) {
   )
 }
 
-export function renderSearchResultsBlock(results: []) {
+export function renderSearchResultsBlock(results: object) {
   const placeItems = [];
-  results.forEach((place: Place) => {
-    placeItems.push(
-      `
-      <li class="result">
-      <div class="result-container">
-        <div class="result-img-container">
-          <div data-id=${place.id} data-name=${JSON.stringify(place.name)} data-image=${place.image} class="favorites js-favorite"></div>
-          <img class="result-img" src="${place.image}" alt="">
-        </div>	
-        <div class="result-info">
-          <div class="result-info--header">
-            <p>${place.name}</p>
-            <p class="price">${place.price}&#8381;</p>
-          </div>
-          <div class="result-info--map"><i class="map-icon"></i> ${place.remoteness}км от вас</div>
-          <div class="result-info--descr">${place.description}</div>
-          <div class="result-info--footer">
-            <div>
-              <button>Забронировать</button>
+  
+  if(Object.keys(results).length != 0){
+    for (let key in results){
+      results[key].forEach((place: Place ) => {
+        placeItems.push(
+          `
+          <li class="result">
+          <div class="result-container">
+            <div class="result-img-container">
+              <div data-id=${place.id} data-name=${JSON.stringify(place.name) || JSON.stringify(place.title)} data-image=${place.image || place.photos[0]} class="favorites js-favorite"></div>
+              <img class="result-img" src="${place.image || place.photos[0]}" alt="">
+            </div>	
+            <div class="result-info">
+              <div class="result-info--header">
+                <p>${place.name || place.title}</p>
+                <p class="price">${place.price || place.totalPrice}&#8381;</p>
+              </div>
+              <div class="result-info--map"><i class="map-icon"></i> ${place.remoteness || ""}км от вас</div>
+              <div class="result-info--descr">${place.description || place.details}</div>
+              <div class="result-info--footer">
+                <div>
+                  <button>Забронировать</button>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
-    </li>
-    `
-    )
+        </li>
+        `
+        )
+    
+      });
+    }
+  }else{
+    placeItems.push(`<li class="result">Данные отсутсвуют</li>`);
+  }
 
-  });
+
   renderBlock(
     'search-results-block',
     `
