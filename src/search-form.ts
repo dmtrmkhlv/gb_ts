@@ -1,121 +1,136 @@
-import { searchPlace } from './get-api.js';
+import { Place } from './store/domain/place.js';
 import { renderBlock } from './lib.js'
 import { renderSearchResultsBlock } from './search-results.js';
+import { FlatrentProvider } from './store/providers/flatrent/flatrent-provider.js';
+import { HomyProvider } from './store/providers/homy/homy-provider.js';
 import { toggleFavoriteItem } from './user.js';
 
-import {FlatRentSdk} from './geekbrains-flat-rent-sdk.js'
+const flatrentProvider = new FlatrentProvider()
+const homyProvider = new HomyProvider()
 
-const sdk = new FlatRentSdk()
-
-// Создать интерфейс SearchFormData, в котором описать структуру для полей поисковой формы. 
 export interface SearchFormData {
-  startDate:string, 
-  endDate:string,
-  maxPrice?: number,
-  flatRent?: boolean,
-  homy?: boolean
+  startDate: string,
+    endDate: string,
+    maxPrice ? : number,
+    flatRent ? : boolean,
+    homy ? : boolean
 }
 
-/*
-2. Написать функцию-обработчик формы search, которая собирает заполненные пользователем данные в формате описанной структуры и передаёт их в функцию поиска.
-3. * Добавить в функцию search вторым аргументом функцию-обратного вызова, которая
-принимает либо ошибку либо массив результатов интерфейса Place. Данный интерфейс пока
-оставить пустым. Функция поиска делает задержку в несколько секунд, после чего с
-вероятностью 50 на 50 выдаёт либо ошибку либо пустой массив.
-*/
-
-export interface Place{
-  id: number | string;
-  image: string;
-  name: string;
-  description: string;
-  remoteness: number;
-  bookedDates: number[];
-  price: number;
-
-  coordinates?:number[]
-  details?:string;
-  photos?:string[];
-  title?:string;
-  totalPrice?:number;
+export interface SortParams {
+    key: string,
+    by: number,
+    value: string
 }
 
-export function CallBack(value: string | Place){
-  if(Math.random() >= 0.5){
+export function CallBack(value: string | Place) {
+  if (Math.random() >= 0.5) {
     throw Error("value");;
   }
   return []
 };
 
-export function search (formName: string, cb:Function = function() {}) {  
+export function sortPlaces(arr: Place[], sort: SortParams) {
+  function sortBy(one: Place, two: Place) {
+    if (one[sort.key] > two[sort.key]) {
+      return sort.by
+    } else if (one[sort.key] < two[sort.key]) {
+      return -sort.by
+    } else {
+      return 0
+    }
+  }
+  return arr.sort(sortBy)
+}
+
+export function search(formName: string, cb: Function = function () {}) {
   const form = document.getElementById(formName);
-  const data = {'startDate':form['check-in-date'].value, 'endDate':form['check-out-date'].value, 'flatRent': form['flat-rent'].checked, 'homy':form['homy'].checked};
+  
+  const data = {
+    'startDate': form['check-in-date'].value,
+    'endDate': form['check-out-date'].value,
+    'flatRent': form['flat-rent'].checked,
+    'homy': form['homy'].checked
+  };
   findData(data);
   setTimeout(cb, 3000);
-  form.addEventListener('submit',(e)=>{
+  form.addEventListener('submit', (e) => {
     e.preventDefault();
-    let data = {'startDate':form['check-in-date'].value, 'endDate':form['check-out-date'].value, 'maxPrice':form['max-price'].value || null, 'flatRent': form['flat-rent'].checked, 'homy':form['homy'].checked};    
+    let data = {
+      'startDate': form['check-in-date'].value,
+      'endDate': form['check-out-date'].value,
+      'maxPrice': form['max-price'].value || null,
+      'flatRent': form['flat-rent'].checked,
+      'homy': form['homy'].checked
+    };
     findData(data);
   })
 }
 
-// Функция поиска принимает как аргумент переменную интерфейса SearchFormData, выводит полученный аргумент в консоль и ничего не возвращает
-export function findData (data: SearchFormData):void {
+export function findData(data: SearchFormData, sortParams?: SortParams ): void {
 
-  new Promise(function(resolve, reject) {
-    
-    if(data['flatRent']){
-      resolve( new Promise((resolve, reject) => { // (*)
-        sdk.search({
-          city: 'Санкт-Петербург',
-          checkInDate: new Date(data['startDate']),
-          checkOutDate: new Date(data['endDate']),
-          priceLimit: data['maxPrice']
-        })
-        .then((flatResult:object|null) => {
-          resolve(flatResult);
-        })
-      }))
+  Promise.all([
+    flatrentProvider.search({
+      city: 'Санкт-Петербург',
+      checkInDate: new Date(data['startDate']),
+      checkOutDate: new Date(data['endDate']),
+      priceLimit: data['maxPrice']
+    }),
+    homyProvider.search({
+      city: [59.9386, 30.3141],
+      checkInDate: new Date(data['startDate']),
+      checkOutDate: new Date(data['endDate']),
+      priceLimit: data['maxPrice']
+    })
+  ]).then((results) => {
+    let allResults: Place[] = []
+    if(data['flatRent'] && data['homy']){
+       allResults = [].concat(results[0], results[1])
+    }else{
+      if(data['flatRent']){
+        allResults = [].concat(results[0])
+      }
+      if(data['homy']){
+        allResults = [].concat(results[1])
+      }
     }
-    resolve({})
 
-  }).then((flatResult: {})=>{
-
-    if(data['homy']){
-      return new Promise((resolve, reject) => {
-        searchPlace(new Date(data['startDate']), new Date(data['endDate']), data['maxPrice'])
-        .then((homyResults:object|null) => {
-          if(Object.keys(flatResult).length != 0){
-            resolve({flatResult, homyResults});
-          }
-          resolve({homyResults});
-        })
-      });
-    }
-    if(Object.keys(flatResult).length != 0){
-      return {flatResult}
-    }
-    return {}
-    
-
-  }).then((allResult: {})=>{    
-    renderSearchResultsBlock(allResult);
+    sortPlaces(allResults, sortParams || {key:"price", by: 1, value: "Сначала дешёвые"})
+    renderSearchResultsBlock(allResults, sortParams?.value || "Сначала дешёвые");
     toggleFavoriteItem();
+
+    const sort = document.getElementById("sort") as HTMLInputElement;
+    sort.addEventListener('change', (e) => {
+      e.preventDefault();
+      const target = e.target as HTMLInputElement;
+      switch (target.value) {
+        case "Сначала дорогие":
+          findData(data, {key:"price", by: -1,  value: target.value});
+          break;
+        case "Сначала дешёвые":
+          findData(data, {key:"price", by: 1, value: target.value});
+          break;
+        case "Сначала ближе":
+          findData(data, {key:"remoteness", by: 1, value: target.value});
+          break;
+      }
+
+    })
   })
+
 }
 
-export function renderSearchFormBlock (data: SearchFormData) {
+export function renderSearchFormBlock(data: SearchFormData) {
   let currentDate = new Date();
   let minDate = `${currentDate.getFullYear()}-${('0'+(currentDate.getMonth()+1)).slice(-2)}-${currentDate.getDate()}`;
-  let maxDateFull = new Date(currentDate.getFullYear(), currentDate.getMonth() + 2, 0);  
+  let maxDateFull = new Date(currentDate.getFullYear(), currentDate.getMonth() + 2, 0);
   let maxDate = `${maxDateFull.getFullYear()}-${('0'+(maxDateFull.getMonth()+1)).slice(-2)}-${maxDateFull.getDate()}`;
-  if(!data.startDate){
+  if (!data.startDate) {
     data.startDate = `${new Date(currentDate).getFullYear()}-${('0'+(currentDate.getMonth()+1)).slice(-2)}-${('0'+(new Date(currentDate).getDate()+1)).slice(-2)}`;
   }
-  if(!data.endDate){
+  if (!data.endDate) {
     data.endDate = `${new Date(currentDate).getFullYear()}-${('0'+(currentDate.getMonth()+1)).slice(-2)}-${('0'+(new Date(currentDate).getDate()+2)).slice(-2)}`;
   }
-  
+
   renderBlock(
     'search-form-block',
     `

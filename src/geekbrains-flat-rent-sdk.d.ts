@@ -1,3 +1,5 @@
+import { SearchFilter } from "./store/domain/search-filter";
+
 declare module flatRentSdk{
     export interface iHotelInfo {
             id: string;
@@ -45,7 +47,7 @@ declare module flatRentSdk{
          * @param {number} [parameters.priceLimit] Max price for a night
          * @returns {Object[]} List of suitable flats.
          */
-        search(parameters: iParameters): Promise<Object|null>
+        search(parameters: SearchFilter): Promise<Object|null>
     
         /**
          * Book flat.
