@@ -1,0 +1,37 @@
+{
+  "name": "gb_ts",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "./public/scripts/index.js",
+  "types": "./public/scripts/types/index.d.ts",
+  "scripts": {
+    "build": "rd -r public\\scripts 2>null & tsc",
+    "develop": "rd -r public\\scripts 2>null & tsc -p tsconfig-dev.json",
+    "start": "http-server -c-1 -p 3000",
+    "start:cli": "node public/scripts",
+    "lint": "eslint src --ext .js --ext .ts",
+    "lint-fix": "eslint src --ext .js --ext .ts --fix"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dmtrmkhlv/gb_ts.git"
+  },
+  "keywords": [
+    "typescript"
+  ],
+  "author": "Dmitry Mikhailov",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dmtrmkhlv/gb_ts/issues"
+  },
+  "homepage": "https://github.com/dmtrmkhlv/gb_ts#readme",
+  "devDependencies": {
+    "@types/node": "^18.7.23",
+    "@typescript-eslint/eslint-plugin": "^5.38.0",
+    "@typescript-eslint/parser": "^5.38.0",
+    "eslint": "^8.23.1",
+    "http-server": "^14.1.1",
+    "typescript": "^4.8.3"
+  }
+}

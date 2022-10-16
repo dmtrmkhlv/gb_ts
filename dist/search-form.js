@@ -1,9 +1,6 @@
-import { renderBlock } from './lib.js'
-
-export function renderSearchFormBlock () {
-  renderBlock(
-    'search-form-block',
-    `
+import { renderBlock } from './lib.js';
+export function renderSearchFormBlock() {
+    renderBlock('search-form-block', `
     <form>
       <fieldset class="search-filedset">
         <div class="row">
@@ -36,6 +33,5 @@ export function renderSearchFormBlock () {
         </div>
       </fieldset>
     </form>
-    `
-  )
+    `);
 }
