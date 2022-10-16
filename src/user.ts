@@ -5,7 +5,7 @@ export class User {
   userName: string;
   userIcon: string;
   userFavorite: number;
-  constructor(userName: string, userIcon: string, userFavorite?: number) {
+  constructor(userName: string, userIcon: string, userFavorite: number) {
     this.userName = userName;
     this.userIcon = userIcon;
     this.userFavorite = userFavorite;
@@ -15,7 +15,7 @@ export class User {
 export function renderUserBlock(
   userName: string,
   userIcon: string,
-  userFavorite?: number
+  userFavorite?: number | string
 ) {
   const favoritesCaption = Boolean(userFavorite) ? userFavorite : "ничего нет";
 
@@ -39,19 +39,21 @@ export function renderUserBlock(
 
 export function toggleFavoriteItem() {
   const allItems = document.querySelector(".js-results-list");
-  allItems.addEventListener("click", (e) => {
+  allItems?.addEventListener("click", (e) => {
     let target = e.target as HTMLElement;
     if (target.classList.contains("js-favorite")) {
       if (target.classList.contains("active")) {
         let newFavoriteData = getFavoritesAmount("favoriteItems");
-        let index = newFavoriteData.findIndex(
-          (item) => item.id == target.dataset.id
-        );
-        if (index != -1) {
-          newFavoriteData.splice(index, 1);
-          localStorage.favoriteItems = JSON.stringify(newFavoriteData);
+        if (typeof newFavoriteData !== "string") {
+          let index = newFavoriteData.findIndex(
+            (item) => item.id == target.dataset.id
+          );
+          if (index != -1) {
+            newFavoriteData.slice(index, 1);
+            localStorage.favoriteItems = JSON.stringify(newFavoriteData);
+          }
+          target.classList.remove("active");
         }
-        target.classList.remove("active");
       } else {
         target.classList.add("active");
         localStorage.favoriteItems = JSON.stringify([

@@ -27,8 +27,10 @@ export interface iLocalStorage {
 
 export function getFavoritesAmount<T extends keyof iLocalStorage>(
   key: T
-): iLocalStorage[T] | null {
+): iLocalStorage[T] | string {
   if (typeof key == "string" && typeof +localStorage[key] == "number") {
     return JSON.parse(localStorage[key]) as iLocalStorage[T];
+  } else {
+    return "not found";
   }
 }

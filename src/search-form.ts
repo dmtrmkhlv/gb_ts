@@ -57,7 +57,7 @@ export function sortPlaces(arr: Place[], sort: iSortParams) {
 export function search(formName: string, cb: Function = function () {}) {
   const form = document.getElementById(formName);
 
-  const data = {
+  let data = {
     startDate: (document.getElementById("check-in-date") as HTMLInputElement)
       .value,
     endDate: (document.getElementById("check-out-date") as HTMLInputElement)
@@ -68,16 +68,15 @@ export function search(formName: string, cb: Function = function () {}) {
   };
   findData(data);
   setTimeout(cb, 3000);
-  form.addEventListener("submit", (e) => {
+  form?.addEventListener("submit", (e) => {
     e.preventDefault();
     let data = {
       startDate: (document.getElementById("check-in-date") as HTMLInputElement)
         .value,
       endDate: (document.getElementById("check-out-date") as HTMLInputElement)
         .value,
-      maxPrice:
-        +(document.getElementById("max-price") as HTMLInputElement).value ||
-        null,
+      maxPrice: +(document.getElementById("max-price") as HTMLInputElement)
+        .value,
       flatRent: (document.getElementById("flat-rent") as HTMLInputElement)
         .checked,
       homy: (document.getElementById("homy") as HTMLInputElement).checked,
@@ -106,13 +105,13 @@ export function findData(
   ]).then((results) => {
     let allResults: Place[] = [];
     if (data["flatRent"] && data["homy"]) {
-      allResults = [].concat(results[0], results[1]);
+      allResults = ([] as Place[]).concat(results[0], results[1]);
     } else {
       if (data["flatRent"]) {
-        allResults = [].concat(results[0]);
+        allResults = ([] as Place[]).concat(results[0]);
       }
       if (data["homy"]) {
-        allResults = [].concat(results[1]);
+        allResults = ([] as Place[]).concat(results[1]);
       }
     }
 
